@@ -33,11 +33,40 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_6
         targetCompatibility JavaVersion.VERSION_1_6
     }
+	
+	signingConfigs {
+		release {
+			storeFile file("someFalseFile.keystore")
+			storePassword "someFalsePassword"
+			keyAlias "someFalseAlias"
+			keyPassword "someFalsePassword"
+		}
+	}
+	
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+}
+
+task loadProps << {
+	def config = new Properties()
+	def propFile = file("../local.properties")
+	if (propFile.canRead()) {
+		config.load(new FileInputStream(propFile))
+		android.signingConfigs.release.storeFile = file(config["release.key.store"])
+        android.signingConfigs.release.storePassword = config["release.key.store.password"]
+        android.signingConfigs.release.keyAlias = config["release.key.alias"]
+        android.signingConfigs.release.keyPassword = config["release.key.password"]
+		println "Building with Alias: ${config['release.key.alias']}"
+	}
+}
+
+tasks.whenTaskAdded { theTask ->
+    if (theTask.name.equals("packageRelease") || theTask.name.equals("packageBeta")) {
+        theTask.dependsOn "loadProps"
     }
 }
 
