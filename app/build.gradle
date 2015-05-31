@@ -46,6 +46,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+			signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -60,7 +61,8 @@ task loadProps << {
         android.signingConfigs.release.storePassword = config["release.key.store.password"]
         android.signingConfigs.release.keyAlias = config["release.key.alias"]
         android.signingConfigs.release.keyPassword = config["release.key.password"]
-		println "Building with Alias: ${config['release.key.alias']}"
+		def keyFile = file(config["release.key.store"])
+		println "Building with Alias: ${config['release.key.alias']} at ${keyFile.getAbsolutePath()}"
 	}
 }
 
