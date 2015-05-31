@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="dark_title">#ff212121</color>
+    <color name="darker_title">#ff000000</color>
+    <color name="light_title">#fffbfbfc</color>
+    <color name="light_subtitle">#ffc3c3c4</color>
+</resources>

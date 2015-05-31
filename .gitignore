@@ -1,0 +1,10 @@
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+run/
+toast_module/build/classes/main/jaci/openrio/module/android/net/MulticastThread.class
+toast_module/build/
+toast_module/out/
