@@ -5,10 +5,6 @@
                 android:layout_height="fill_parent"
                 tools:context=".ConnectedActivity">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar"/>
-
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

@@ -7,13 +7,14 @@ import jaci.openrio.module.android.tile.Tile;
 import jaci.openrio.module.android.tile.TileRegistry;
 import jaci.openrio.module.android.tile.TileTicker;
 import jaci.openrio.toast.core.Toast;
+import jaci.openrio.toast.core.ToastConfiguration;
 import jaci.openrio.toast.core.command.AbstractCommand;
 import jaci.openrio.toast.core.command.CommandBus;
 import jaci.openrio.toast.core.loader.annotation.Priority;
-import jaci.openrio.toast.core.loader.groovy.GroovyPreferences;
 import jaci.openrio.toast.core.network.SocketManager;
 import jaci.openrio.toast.core.thread.Heartbeat;
 import jaci.openrio.toast.lib.log.Logger;
+import jaci.openrio.toast.lib.module.ModuleConfig;
 import jaci.openrio.toast.lib.module.ToastModule;
 
 import java.net.DatagramPacket;
@@ -29,7 +30,7 @@ import java.util.Random;
  */
 public class ToastDroid extends ToastModule {
 
-    protected static GroovyPreferences preferences;
+    protected static ModuleConfig preferences;
     public static RobotIdentifier currentID;
     public static Logger log;
     protected static Thread multicastThread;
@@ -46,7 +47,7 @@ public class ToastDroid extends ToastModule {
 
     @Priority(level = Priority.Level.HIGHEST)
     public void prestart() {
-        preferences = new GroovyPreferences("toast_droid");
+        preferences = new ModuleConfig("toast_droid");
         log = new Logger("ToastDroid", Logger.ATTR_DEFAULT);
         BoundDelegate mainDelegate = SocketManager.register("TOAST_DroidMain");
         mainDelegate.callback(new MainDelegate());
@@ -62,23 +63,23 @@ public class ToastDroid extends ToastModule {
     }
 
     public static String getFriendlyName() {
-        return preferences.getString("id.name", "My Robot", "The 'Friendly Name' for your RoboRIO. This is what is displayed on the Android Device when your device is discovered");
+        return ToastConfiguration.Property.ROBOT_NAME.asString();
     }
 
     public static int getTeamNumber() {
-        return preferences.getInt("id.team", 1234, "Your Team Number. This is shown on the Android Device to show that the robot does indeed belong to you");
+        return ToastConfiguration.Property.ROBOT_TEAM.asInt();
     }
 
     public static String getDescription() {
-        return preferences.getString("id.desc", "My Toasted RoboRIO", "A description to present to any clients that wish to connect to your RoboRIO. Use this to talk about your team or just as an identifier if you have multiple RoboRIOs");
+        return ToastConfiguration.Property.ROBOT_DESC.asString();
     }
 
     public static String getInterfaceHostname() {
-        return preferences.getString("protocol.hostname", "", "The hostname (IP Address) of the environment. Change this to your Local IP address if you are on a device with multiple network interfaces. This setting is often turned on for Virtual Box users or people with multiple network cards");
+        return preferences.getString("protocol.hostname", "");
     }
 
     public static boolean getPreferIPv4() {
-        return preferences.getBoolean("protocol.preferIPv4", true, "Prefers the IPv4 stack for devices with IPv6 compatibility. For almost all cases this should be true, as the Android app is tuned for IPv4. If you want to break everything, you can set it to false. ");
+        return preferences.getBoolean("protocol.preferIPv4", true);
     }
 
 

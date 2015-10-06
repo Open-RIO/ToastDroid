@@ -93,21 +93,25 @@ public class TileFragment extends Fragment {
         }
     }
 
+    public void attachListener(TouchListener parent) {
+        listener = parent;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_tile, container, false);
         refresh_view(v);
         try {
             final TileFragment t = this;
-            v.setOnTouchListener(new View.OnTouchListener() {
+            v.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (listener != null && event.getAction() == MotionEvent.ACTION_DOWN) {
+                public void onClick(View v) {
+                    if (listener != null) {
                         listener.onTileTouched(t);
                     }
-                    return false;
                 }
             });
+
         } catch (Exception e) {}
         return v;
     }

@@ -42,7 +42,8 @@ configurations {
 }
 
 dependencies {
-  compile group: 'jaci.openrio.toast', name: 'Toast', version: '+'    //Change this line to update Toast
+  //compile group: 'jaci.openrio.toast', name: 'Toast', version: '+'    //Change this line to update Toast
+   compile fileTree(include: ['*.jar'], dir: 'libs')
   deployerJars 'org.apache.maven.wagon:wagon-ssh:2.2'
 } 
 

@@ -4,4 +4,7 @@
     <color name="darker_title">#ff000000</color>
     <color name="light_title">#fffbfbfc</color>
     <color name="light_subtitle">#ffc3c3c4</color>
+    <color name="primary">#ffd7006e</color>
+    <color name="primary_pressed">#ff900063</color>
+    <color name="ripple">#ff900063</color>
 </resources>

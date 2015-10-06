@@ -1,11 +1,15 @@
 package jaci.openrio.module.android.net;
 
 import android.graphics.Color;
+import android.util.JsonReader;
 import jaci.openrio.module.android.MainActivity;
 import jaci.openrio.module.android.fragments.AvailableDevice;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.Arrays;
@@ -77,10 +81,28 @@ public class PacketManager {
         return null;
     }
 
+    public static JSONObject profiler(DataInputStream stream) {
+        try {
+            byte[] data = new byte[decodeint(stream)];
+            stream.read(data);
+            String jsonstring = new String(data);
+            return new JSONObject(jsonstring);
+        } catch (Exception e) {}
+        return null;
+    }
+
     static byte[] extract(byte[] from, int index, int len) {
         byte[] data = new byte[len];
         System.arraycopy(from, index, data, 0, len);
         return data;
+    }
+
+    static int decodeint(DataInputStream in) throws IOException {
+        int ch1 = in.read();
+        int ch2 = in.read();
+        int ch3 = in.read();
+        int ch4 = in.read();
+        return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }
 
     public static class Tile {

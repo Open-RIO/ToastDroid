@@ -69,6 +69,9 @@ public class MainDelegate implements BoundDelegate.ConnectionCallback {
                                 String id = PacketManager.decodeTouch(in);
                                 TileRegistry.process_touch(id);
                                 break;
+                            case 0x11:
+                                broadcast(PacketManager.encodeProfiler());
+                                break;
                         }
                     }
                     continue;

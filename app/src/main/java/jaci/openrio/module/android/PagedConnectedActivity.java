@@ -1,38 +1,43 @@
 package jaci.openrio.module.android;
 
-import android.content.Context;
+
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
+import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.GridLayout;
+import com.melnykov.fab.FloatingActionButton;
 import jaci.openrio.delegate.DelegateClient;
+import jaci.openrio.module.android.fragments.PagerFragment;
+import jaci.openrio.module.android.fragments.ProfilerPageFragment;
 import jaci.openrio.module.android.fragments.TileFragment;
+import jaci.openrio.module.android.fragments.TilePageFragment;
 import jaci.openrio.module.android.net.PacketManager;
+import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
+public class PagedConnectedActivity extends ActionBarActivity implements TileFragment.TouchListener {
 
-public class ConnectedActivity extends ActionBarActivity implements TileFragment.TouchListener {
-
-    String uid;
-    PacketManager.RobotID id;
+    public String uid;
+    public PacketManager.RobotID id;
+    public SectionPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,17 +48,91 @@ public class ConnectedActivity extends ActionBarActivity implements TileFragment
             id = PacketManager.robotIDs.get(uid);
         }
 
-        try {
-            setContentView(R.layout.activity_connected);
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            toolbar.setTitle(Integer.toString(id.getTeam()));
-            setSupportActionBar(toolbar);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch (Throwable e) {
-            e.printStackTrace();
+        setContentView(R.layout.activity_paged_connected);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(Integer.toString(id.getTeam()));
+        setSupportActionBar(toolbar);
+
+        TabLayout tabber = (TabLayout) findViewById(R.id.tabber);
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+
+        adapter = new SectionPagerAdapter(getSupportFragmentManager(), this);
+        pager.setAdapter(adapter);
+        tabber.setupWithViewPager(pager);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.fab);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), LoggerActivity.class);
+                intent.putExtra("uid", uid);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_out);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_paged_connected, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                getSupportFragmentManager().popBackStack();
+                finish();
+                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_out);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_out);
+    }
+
+    public class SectionPagerAdapter extends FragmentPagerAdapter {
+
+        public PagerFragment[] fragments;
+
+        PagedConnectedActivity act;
+
+        public SectionPagerAdapter(FragmentManager fm, PagedConnectedActivity act) {
+            super(fm);
+            this.act = act;
+
+            fragments = new PagerFragment[] {
+                    PagerFragment.newInstance("Tiles", TilePageFragment.class, act),
+                    PagerFragment.newInstance("Profiler", ProfilerPageFragment.class, act)
+            };
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return fragments[position];
+        }
+
+        @Override
+        public int getCount() {
+            return fragments.length;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return fragments[position].tab_name;
         }
     }
 
+    //Net
     Thread delegateThread;
     DelegateClient client;
     Socket socket;
@@ -89,12 +168,22 @@ public class ConnectedActivity extends ActionBarActivity implements TileFragment
                             case 0x03:
                                 String id = PacketManager.destroyTile(dis);
                                 break;
+                            case 0x04:
+                                final JSONObject obj = PacketManager.profiler(dis);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            ((ProfilerPageFragment)adapter.fragments[1]).chartUpdate(obj);
+                                        } catch (Exception e) {}
+                                    }
+                                });
+                                break;
                         }
                     }
                 } catch (Exception e) {
                     run = false;
                     setBarColor(Color.RED);
-                    e.printStackTrace();
                 }
             }
         });
@@ -132,12 +221,14 @@ public class ConnectedActivity extends ActionBarActivity implements TileFragment
     public void onStart() {
         super.onStart();
         tiles.clear();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ((GridLayout) findViewById(R.id.tile_container)).removeAllViews();
-            }
-        });
+        try {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ((GridLayout)adapter.fragments[0].getView().findViewById(R.id.tile_container)).removeAllViews();
+                }
+            });
+        } catch (Exception e) {}
         delegate();
     }
 
@@ -153,11 +244,12 @@ public class ConnectedActivity extends ActionBarActivity implements TileFragment
             });
         } else {
             final TileFragment fragment = TileFragment.newInstance(id, tile.title, tile.subtitles, tile.color);
+            fragment.attachListener(this);
             tiles.put(id, fragment);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    FragmentManager manager = getSupportFragmentManager();
+                    FragmentManager manager = adapter.fragments[0].getFragmentManager();     //TODO Fix Orientation
                     FragmentTransaction transaction = manager.beginTransaction();
                     transaction.setCustomAnimations(R.anim.device_found, R.anim.device_found);
                     transaction.add(R.id.tile_container, fragment);
@@ -174,7 +266,7 @@ public class ConnectedActivity extends ActionBarActivity implements TileFragment
 
                 @Override
                 public void run() {
-                    FragmentManager manager = getSupportFragmentManager();
+                    FragmentManager manager = adapter.fragments[0].getFragmentManager();     //Frag
                     FragmentTransaction transaction = manager.beginTransaction();
                     transaction.setCustomAnimations(R.anim.device_found, R.anim.device_found);
                     transaction.remove(tile);
@@ -183,31 +275,6 @@ public class ConnectedActivity extends ActionBarActivity implements TileFragment
             });
             tiles.remove(id);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_connected, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case android.R.id.home:
-                getSupportFragmentManager().popBackStack();
-                finish();
-                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_out);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_out);
     }
 
     @Override
@@ -220,6 +287,15 @@ public class ConnectedActivity extends ActionBarActivity implements TileFragment
                 outStream.flush();
             } catch (IOException e) {
             }
+        }
+    }
+
+    public void updateProfiler() {
+        if (run && outStream != null) {
+            try {
+                outStream.writeByte(0x11);
+                outStream.flush();
+            } catch (IOException e) {}
         }
     }
 }

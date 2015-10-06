@@ -2,6 +2,7 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="windowActionBar">false</item>
+        <item name="colorAccent">@color/primary</item>
     </style>
 
 </resources>

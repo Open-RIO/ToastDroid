@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 
 import android.widget.ImageButton;
 import android.widget.TextView;
-import jaci.openrio.module.android.ConnectedActivity;
 import jaci.openrio.module.android.MainActivity;
+import jaci.openrio.module.android.PagedConnectedActivity;
 import jaci.openrio.module.android.R;
 
 public class AvailableDevice extends Fragment {
@@ -74,7 +74,7 @@ public class AvailableDevice extends Fragment {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    Intent intent = new Intent(MainActivity.INSTANCE.getApplicationContext(), ConnectedActivity.class);
+                    Intent intent = new Intent(MainActivity.INSTANCE.getApplicationContext(), PagedConnectedActivity.class);
                     intent.putExtra("uid", uid);
                     MainActivity.INSTANCE.startActivity(intent);
                     MainActivity.INSTANCE.overridePendingTransition(R.anim.slide_from_right, R.anim.slide_out);

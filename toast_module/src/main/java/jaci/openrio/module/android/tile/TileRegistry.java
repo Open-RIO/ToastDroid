@@ -5,7 +5,6 @@ import jaci.openrio.module.android.net.PacketManager;
 import jaci.openrio.module.android.tile.stock.TilePDP;
 import jaci.openrio.toast.core.command.AbstractCommand;
 import jaci.openrio.toast.core.command.CommandBus;
-import jaci.openrio.toast.core.loader.groovy.GroovyLoader;
 import jaci.openrio.toast.core.loader.module.ModuleContainer;
 import jaci.openrio.toast.core.loader.module.ModuleManager;
 

@@ -1,7 +1,7 @@
 package jaci.openrio.module.android.net;
 
 import jaci.openrio.module.android.ToastDroid;
-import jaci.openrio.toast.core.thread.ToastThreadPool;
+import jaci.openrio.toast.core.thread.Async;
 
 import java.io.IOException;
 import java.net.*;
@@ -39,7 +39,7 @@ public class MulticastThread extends Thread {
 
                     String received = new String(packet.getData());
                     if (received.trim().equals("TOAST_DROID_REQUEST")) {
-                        ToastThreadPool.INSTANCE.addWorker(new Runnable() {
+                        Async.INSTANCE.submit(new Runnable() {
                             @Override
                             public void run() {
                                 try {

@@ -9,6 +9,7 @@ buildscript {
 apply plugin: 'com.android.application'
 
 repositories {
+    mavenCentral()
     jcenter()
     maven {
         name = "Jaci"
@@ -78,6 +79,8 @@ dependencies {
     compile 'com.android.support:cardview-v7:22.1.1'
     compile 'com.android.support:gridlayout-v7:22.1.1'
     compile 'com.android.support:support-v4:22.1.1'
+    compile 'com.android.support:design:22.2.0'
     compile 'jaci.openrio.delegate:NetworkDelegate:+'
-    compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
+    compile 'com.melnykov:floatingactionbutton:1.0.7'
+    compile 'com.github.PhilJay:MPAndroidChart:v2.1.2'
 }

@@ -1,13 +1,16 @@
 package jaci.openrio.module.android.net;
 
+import com.grack.nanojson.JsonWriter;
 import jaci.openrio.module.android.RobotIdentifier;
 import jaci.openrio.module.android.tile.Tile;
 import jaci.openrio.toast.lib.Version;
+import jaci.openrio.toast.lib.profiler.Profiler;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,6 +90,16 @@ public class PacketManager {
         return stream.toByteArray();
     }
 
+    public static byte[] encodeProfiler() {
+        byte[] b = new byte[2048];
+        b[0] = 0x04;
+        byte[] json = JsonWriter.indent("\t").string().value(Profiler.INSTANCE.toJSON()).done().getBytes();
+        encode(encodeint(json.length), b, 1);
+        encode(json, b, 5);
+
+        return b;
+    }
+
     public static byte[] encodeDestroy(Tile tile) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         stream.write(0x03);
@@ -99,6 +112,15 @@ public class PacketManager {
         byte[] data = new byte[dis.readByte()];
         dis.read(data);
         return new String(data);
+    }
+
+    static byte[] encodeint(int v) {
+        byte[] data = new byte[4];
+        data[0] = (byte) ((v >>> 24) & 0xFF);
+        data[1] = (byte) ((v >>> 16) & 0xFF);
+        data[2] = (byte) ((v >>>  8) & 0xFF);
+        data[3] = (byte) ((v >>>  0) & 0xFF);
+        return data;
     }
 
     static void encode(byte[] src, byte[] dest, int index) {
