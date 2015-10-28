@@ -3,10 +3,11 @@ package jaci.openrio.module.android.tile;
 import jaci.openrio.module.android.net.MainDelegate;
 import jaci.openrio.module.android.net.PacketManager;
 
-import java.awt.*;
 
 /**
  * The Base Class for a Tile. Extend this or invoke it yourself and register in the {@link TileRegistry}
+ *
+ * NOTE: Colors are stored as numbers because java.awt is not supported on the RoboRIO.
  *
  * @author Jaci
  */
@@ -15,7 +16,8 @@ public class Tile {
     String title;
     String id;
     String[] subtitles;
-    Color color;
+
+    int color = 0;
 
     /**
      * Create a new Tile. Does not register the tile.
@@ -27,7 +29,7 @@ public class Tile {
         this.id = id;
         this.title = title;
         this.subtitles = subtitles;
-        color = new Color(33,33,33);
+        setColor(33, 33, 33);
     }
 
     /**
@@ -62,15 +64,38 @@ public class Tile {
      * Get the color of the card. By default, this is rgb(33, 33, 33). This will only be updated on the device if the color
      * is detected as changed.
      */
-    public Color getColor() {
+    public int getColor() {
         return color;
+    }
+
+    /* COLOR CONVERSIONS */
+
+    public int getRed() {
+        return (getColor() >> 16) & 0xFF;
+    }
+
+    public int getGreen() {
+        return (getColor() >> 8) & 0xFF;
+    }
+
+    public int getBlue() {
+        return (getColor() >> 0) & 0xFF;
     }
 
     /**
      * Set the color of the card. By default, this is rgb(33, 33, 33)
      */
-    public void setColor(Color col) {
-        color = col;
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    /**
+     * Set the color of the card. By default, this is rgb(33, 33, 33)
+     */
+    public void setColor(int r, int g, int b) {
+        color = ((r & 0xFF) << 16) |
+                ((g & 0xFF) << 8)  |
+                ((b & 0xFF) << 0);
     }
 
     /**

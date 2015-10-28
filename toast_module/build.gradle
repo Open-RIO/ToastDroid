@@ -30,7 +30,7 @@ repositories {
 }
 
 archivesBaseName = "ToastDroid"
-version = "0.1.0"
+version = "0.2.0"
 group = "jaci.openrio.droid"
 
 gradlerio.team = "5333"                                   //Your FRC team number (e.g. 5333 for team 'Can't C#', or 47 for Chief Delphi)
@@ -42,8 +42,7 @@ configurations {
 }
 
 dependencies {
-  //compile group: 'jaci.openrio.toast', name: 'Toast', version: '+'    //Change this line to update Toast
-   compile fileTree(include: ['*.jar'], dir: 'libs')
+  compile group: 'jaci.openrio.toast', name: 'Toast', version: '+'    //Change this line to update Toast
   deployerJars 'org.apache.maven.wagon:wagon-ssh:2.2'
 } 
 

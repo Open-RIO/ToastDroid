@@ -6,7 +6,6 @@ import jaci.openrio.module.android.tile.Tile;
 import jaci.openrio.toast.lib.Version;
 import jaci.openrio.toast.lib.profiler.Profiler;
 
-import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -83,10 +82,9 @@ public class PacketManager {
             stream.write(sub.getBytes("UTF-8").length);
             stream.write(sub.getBytes("UTF-8"));
         }
-        Color color = tile.getColor();
-        stream.write(color.getRed() - 127);
-        stream.write(color.getGreen() - 127);
-        stream.write(color.getBlue() - 127);
+        stream.write(tile.getRed() - 127);
+        stream.write(tile.getGreen() - 127);
+        stream.write(tile.getBlue() - 127);
         return stream.toByteArray();
     }
 

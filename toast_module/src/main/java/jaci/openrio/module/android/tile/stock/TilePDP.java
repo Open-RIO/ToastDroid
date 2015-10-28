@@ -7,8 +7,6 @@ import jaci.openrio.module.android.tile.Tile;
 import jaci.openrio.toast.core.Toast;
 import jaci.openrio.toast.lib.math.MathHelper;
 
-import java.awt.*;
-
 /**
  * A Tile for the Power Distribution Panel. Shows PDP data, tap to expand.
  * Turns red if the Robot is browned out.
@@ -31,9 +29,9 @@ public class TilePDP extends Tile {
         update++;
         if (update >= 2) {
             if (!ControllerPower.getEnabled6V() || !ControllerPower.getEnabled3V3() || !ControllerPower.getEnabled5V())
-                setColor(new Color(100, 33, 33));
+                setColor(100, 33, 33);
             else
-                setColor(new Color(33, 33, 33));
+                setColor(33, 33, 33);
             update();
         }
     }
