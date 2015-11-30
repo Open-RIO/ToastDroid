@@ -42,7 +42,7 @@ public class ToastDroid extends ToastModule {
 
     @Override
     public String getModuleVersion() {
-        return "0.2.0";
+        return "0.3.0";
     }
 
     @Priority(level = Priority.Level.HIGHEST)
